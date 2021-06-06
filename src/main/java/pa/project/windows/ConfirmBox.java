@@ -11,6 +11,13 @@ import javafx.stage.Stage;
 public class ConfirmBox {
 
     private static boolean answer;
+
+    /**
+     * This method creates a window for confirmation
+     * @param title represents the title of the window
+     * @param text represents the text which will be added in the window
+     * @return true if the answer is yes, false otherwise
+     */
     public static boolean display(String title, String text) {
         Stage window = new Stage();
 

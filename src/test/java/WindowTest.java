@@ -35,10 +35,4 @@ public class WindowTest {
     public void testCheckOccurrences() {
         assertEquals(7, window.countOccurrences('_', "t_e_s_t_o_c_curren_ces"));
     }
-
-    /*@RepeatedTest(10)
-    @DisplayName("Logger should work")
-    public void testLogger() {
-        assertNotNull();
-    }*/
 }

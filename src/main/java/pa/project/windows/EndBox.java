@@ -10,6 +10,13 @@ import javafx.stage.Stage;
 
 public class EndBox {
     private static boolean answer;
+
+    /**
+     * This method creates a window for starting a new game or leave the game
+     * @param title represents the title of the window
+     * @param text represents represents the text which will be added in the window
+     * @return true if the answer is "leave the game", false otherwise
+     */
     public static boolean display(String title, String text) {
         Stage window = new Stage();
 

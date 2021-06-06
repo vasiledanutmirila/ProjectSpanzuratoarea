@@ -37,6 +37,9 @@ public class Window {
     public List<String> letterList;
     public String originalWord;
 
+    /**
+     * This method creates the starting window
+     */
     public void createStartWindow(Stage window) {
         initWordsRepository();
 
@@ -72,6 +75,9 @@ public class Window {
         window.show();
     }
 
+    /**
+     * This method creates the game window
+     */
     public void createGameWindow(Stage window) {
 
         initVariables();
@@ -139,6 +145,9 @@ public class Window {
         });
     }
 
+    /**
+     * This method can close the window
+     */
     private void closeProgram(Stage window) throws IOException {
         boolean answer = ConfirmBox.display("Iesire", "Esti sigur ca vrei sa parasesti aplicatia?");
         if (answer) {
@@ -147,6 +156,9 @@ public class Window {
         }
     }
 
+    /**
+     * This method can start a new window
+     */
     private void resetProgram(Stage window) throws IOException {
         boolean answer = ConfirmBox.display("Reset", "Esti sigur ca vrei sa incepi din nou?");
         if (answer) {
@@ -155,13 +167,17 @@ public class Window {
         }
     }
 
+    /**
+     * This method verifies if the input string is letter
+     */
     private boolean isLetter(TextField input, String text) {
         text = text.toUpperCase();
-        //input.setStyle("-fx-text-fill: black;");
         return text.length() == 1 && text.charAt(0) >= 'A' && text.charAt(0) <= 'Z';
-        //input.setStyle("-fx-text-fill: red;");
     }
 
+    /**
+     * This method counts the occurrences of a character in a string
+     */
     public int countOccurrences(char c, String s) {
         int count = 0;
         for (int i = 0; i < s.length(); i++) {
@@ -172,6 +188,9 @@ public class Window {
         return count;
     }
 
+    /**
+     * This method creates a new line
+     */
     private Line createLine(int x1, int x2, int y1, int y2) {
         Line line = new Line();
         line.setStartX(x1);
@@ -183,6 +202,9 @@ public class Window {
         return line;
     }
 
+    /**
+     * This method creates a new circle
+     */
     private Circle createCircle(int x, int y, int r) {
         Circle circle = new Circle();
         circle.setCenterX(x);
@@ -193,6 +215,9 @@ public class Window {
         return circle;
     }
 
+    /**
+     * This method checks the number of tries
+     */
     private void checkTries(Group drawing) {
         switch (tries) {
             case 1:
@@ -222,6 +247,9 @@ public class Window {
         }
     }
 
+    /**
+     * This method creates the initial drawing
+     */
     private void drawSpanzuratoare(Group drawing) {
         Line line1 = createLine(50, 50, 600, 100);
         Line line2 = createLine(50, 300, 100, 100);
@@ -231,12 +259,18 @@ public class Window {
         drawing.getChildren().addAll(line1, line2, line3, line4, line5);
     }
 
+    /**
+     * This method initializes the words repository
+     */
     public void initWordsRepository() {
         EntityManagerFactory factory = Manager.getFactory();
         EntityManager manager = factory.createEntityManager();
         wordsRepository = new WordsRepository(manager);
     }
 
+    /**
+     * This method initializes a word
+     */
     public Words initWord() {
 
         int maxId = wordsRepository.getMaxId();
@@ -246,6 +280,9 @@ public class Window {
         return wordsRepository.getById(word_id);
     }
 
+    /**
+     * This method initializes the game menu
+     */
     private void initGameMenu(VBox gameMenu, Stage window) {
 
         Button endGameButton = new Button("Paraseste Jocul");
@@ -268,6 +305,9 @@ public class Window {
         gameMenu.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * This method initializes the domain space
+     */
     private void initDomainSpace(HBox wordDomain) {
         Label domainLabel = new Label(domain);
         domainLabel.setFont(new Font(50));
@@ -275,6 +315,9 @@ public class Window {
         wordDomain.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * This method handles the input
+     */
     private void handleInput(TextField letterText, Label wordToGuessLabel, Group drawing, Stage window, Label lettersUsed) throws IOException {
         if (isLetter(letterText, letterText.getText())) {
             //System.out.println(letterText.getText());
@@ -342,6 +385,9 @@ public class Window {
         letterText.requestFocus();
     }
 
+    /**
+     * This method sets the layout of the game window
+     */
     private void setGameLayout(BorderPane gameLayout, VBox gameMenu, HBox wordDomain, VBox letterInput, VBox content, Group drawing) {
         gameLayout.setRight(gameMenu);
         gameLayout.setTop(wordDomain);
@@ -351,6 +397,9 @@ public class Window {
         gameLayout.setPadding(new Insets(20, 20, 20, 20));
     }
 
+    /**
+     * This method initializes a part of variables
+     */
     public void initVariables() {
         letterList = new ArrayList<>();
 
@@ -363,6 +412,9 @@ public class Window {
         tries = 0;
     }
 
+    /**
+     * This method creates log messages
+     */
     public void createLogMessage(String message) throws IOException {
         SpanzuratoareaLogger log = new SpanzuratoareaLogger("log.txt");
         log.logger.setLevel(Level.INFO);
