@@ -13,31 +13,40 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import pa.project.entities.Words;
+import pa.project.logger.SpanzuratoareaLogger;
 import pa.project.manager.Manager;
 import pa.project.repositories.WordsRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class Window {
-    private Scene startScene;
-    private Scene gameScene;
-    private String word;
-    private String domain;
-    private String wordToGuess;
-    private int tries;
-    private WordsRepository wordsRepository;
-    private List<String> letterList;
-    private String originalWord;
+    public Scene startScene;
+    public Scene gameScene;
+    public String word;
+    public String domain;
+    public String wordToGuess;
+    public int tries;
+    public WordsRepository wordsRepository;
+    public List<String> letterList;
+    public String originalWord;
 
     public void createStartWindow(Stage window) {
+        initWordsRepository();
+
         window.setOnCloseRequest(event -> {
             event.consume();
-            closeProgram(window);
+            try {
+                closeProgram(window);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
         });
         window.setTitle("Spanzuratoarea");
 
@@ -45,6 +54,11 @@ public class Window {
         Label startGameLabel = new Label("Incepe jocul!");
         Button startGameButton = new Button("Incepe Jocul");
         startGameButton.setOnAction(event -> {
+            try {
+                createLogMessage("Ai inceput jocul");
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
             createGameWindow(window);
             window.setScene(gameScene);
         });
@@ -64,7 +78,11 @@ public class Window {
 
         window.setOnCloseRequest(event -> {
             event.consume();
-            closeProgram(window);
+            try {
+                closeProgram(window);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
         });
 
         //Game Menu
@@ -112,19 +130,27 @@ public class Window {
         window.setScene(gameScene);
         window.show();
 
-        textFieldButton.setOnAction(event -> handleInput(letterText, wordToGuessLabel, drawing, window, lettersUsed));
+        textFieldButton.setOnAction(event -> {
+            try {
+                handleInput(letterText, wordToGuessLabel, drawing, window, lettersUsed);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        });
     }
 
-    private void closeProgram(Stage window) {
+    private void closeProgram(Stage window) throws IOException {
         boolean answer = ConfirmBox.display("Iesire", "Esti sigur ca vrei sa parasesti aplicatia?");
         if (answer) {
+            createLogMessage("Ai inchis jocul");
             window.close();
         }
     }
 
-    private void resetProgram(Stage window) {
+    private void resetProgram(Stage window) throws IOException {
         boolean answer = ConfirmBox.display("Reset", "Esti sigur ca vrei sa incepi din nou?");
         if (answer) {
+            createLogMessage("Ai dat reset");
             createStartWindow(window);
         }
     }
@@ -136,7 +162,7 @@ public class Window {
         //input.setStyle("-fx-text-fill: red;");
     }
 
-    private int countOccurrences(char c, String s) {
+    public int countOccurrences(char c, String s) {
         int count = 0;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == c) {
@@ -205,10 +231,13 @@ public class Window {
         drawing.getChildren().addAll(line1, line2, line3, line4, line5);
     }
 
-    private Words initWord() {
+    public void initWordsRepository() {
         EntityManagerFactory factory = Manager.getFactory();
         EntityManager manager = factory.createEntityManager();
         wordsRepository = new WordsRepository(manager);
+    }
+
+    public Words initWord() {
 
         int maxId = wordsRepository.getMaxId();
 
@@ -220,9 +249,21 @@ public class Window {
     private void initGameMenu(VBox gameMenu, Stage window) {
 
         Button endGameButton = new Button("Paraseste Jocul");
-        endGameButton.setOnAction(event -> closeProgram(window));
+        endGameButton.setOnAction(event -> {
+            try {
+                closeProgram(window);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        });
         Button resetButton = new Button("Reset");
-        resetButton.setOnAction(event -> resetProgram(window));
+        resetButton.setOnAction(event -> {
+            try {
+                resetProgram(window);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        });
         gameMenu.getChildren().addAll(resetButton, endGameButton);
         gameMenu.setAlignment(Pos.CENTER);
     }
@@ -234,7 +275,7 @@ public class Window {
         wordDomain.setAlignment(Pos.CENTER);
     }
 
-    private void handleInput(TextField letterText, Label wordToGuessLabel, Group drawing, Stage window, Label lettersUsed) {
+    private void handleInput(TextField letterText, Label wordToGuessLabel, Group drawing, Stage window, Label lettersUsed) throws IOException {
         if (isLetter(letterText, letterText.getText())) {
             //System.out.println(letterText.getText());
             wordToGuess = wordToGuessLabel.getText();
@@ -257,9 +298,12 @@ public class Window {
                 }
                 wordToGuessLabel.setText(wordToGuess);
                 if (countOccurrences('_', wordToGuess) == 0) {
+                    createLogMessage("Ai castigat");
                     if (EndBox.display("Ai castigat", "Ai castigat")) {
+                        createLogMessage("Ai parasit jocul");
                         window.close();
                     } else {
+                        createLogMessage("Ai inceput un joc nou");
                         createStartWindow(window);
                     }
                 }
@@ -268,9 +312,12 @@ public class Window {
 
         if (!isLetter(letterText, letterText.getText()) && letterText.getText().length() == originalWord.length()) {
             wordToGuessLabel.setText(originalWord);
+            createLogMessage("Ai castigat");
             if (EndBox.display("Ai castigat", "Ai castigat")) {
+                createLogMessage("Ai parasit jocul");
                 window.close();
             } else {
+                createLogMessage("Ai inceput un joc nou");
                 createStartWindow(window);
             }
         }
@@ -282,9 +329,12 @@ public class Window {
 
         if (tries > 5) {
             wordToGuessLabel.setText(originalWord);
+            createLogMessage("Ai pierdut");
             if (EndBox.display("Ai pierdut", "Ai pierdut")) {
+                createLogMessage("Ai parasit jocul");
                 window.close();
             } else {
+                createLogMessage("Ai inceput un joc nou");
                 createStartWindow(window);
             }
         }
@@ -301,7 +351,7 @@ public class Window {
         gameLayout.setPadding(new Insets(20, 20, 20, 20));
     }
 
-    private void initVariables() {
+    public void initVariables() {
         letterList = new ArrayList<>();
 
         Words words = initWord();
@@ -311,5 +361,12 @@ public class Window {
         domain = words.getWordDomain();
 
         tries = 0;
+    }
+
+    public void createLogMessage(String message) throws IOException {
+        SpanzuratoareaLogger log = new SpanzuratoareaLogger("log.txt");
+        log.logger.setLevel(Level.INFO);
+        log.logger.info(message);
+        log.fileHandler.close();
     }
 }
